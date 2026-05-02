@@ -36,20 +36,33 @@ function TiltCard({ children, accent }: { children: React.ReactNode; accent: str
 
 /* Space thumbnail for project card */
 export function SpaceThumbnail({ project }: { project: Project }) {
+  // Deterministic random so we don't get hydration mismatch (flicker)
+  const hashString = (str: string) => {
+    let hash = 0;
+    for (let i = 0; i < str.length; i++) hash = Math.imul(31, hash) + str.charCodeAt(i);
+    return hash;
+  };
+  const seed = hashString(project.title || "project");
+  const random = (i: number) => {
+    const x = Math.sin(seed + i) * 10000;
+    return x - Math.floor(x);
+  };
+
   return (
     <div className={`h-44 relative flex items-center justify-center overflow-hidden w-full`}
       style={{ background: `radial-gradient(ellipse at 30% 40%, ${project.nebula} 0%, rgba(5,5,10,0.95) 70%)` }}>
       {/* Star mini field in thumbnail */}
-      {Array.from({ length: 20 }, (_, i) => (
+      {Array.from({ length: 12 }, (_, i) => (
         <motion.div key={i}
           className="absolute rounded-full"
           style={{
-            left: `${Math.random() * 100}%`, top: `${Math.random() * 100}%`,
-            width: Math.random() > 0.7 ? 2 : 1, height: Math.random() > 0.7 ? 2 : 1,
-            background: '#ffffff', opacity: 0.4 + Math.random() * 0.4,
+            left: `${random(i) * 100}%`, top: `${random(i + 15) * 100}%`,
+            width: random(i + 30) > 0.7 ? 2 : 1, height: random(i + 30) > 0.7 ? 2 : 1,
+            background: '#ffffff', opacity: 0.4 + random(i + 45) * 0.4,
+            willChange: 'opacity'
           }}
           animate={{ opacity: [0.2, 0.9, 0.2] }}
-          transition={{ duration: 2 + Math.random() * 2, delay: Math.random() * 3, repeat: Infinity }} />
+          transition={{ duration: 2 + random(i + 60) * 2, delay: random(i + 75) * 3, repeat: Infinity }} />
       ))}
 
       {/* Nebula swirl */}
@@ -59,6 +72,7 @@ export function SpaceThumbnail({ project }: { project: Project }) {
           width: 160, height: 80,
           background: `radial-gradient(ellipse, ${project.accent}25 0%, transparent 70%)`,
           filter: 'blur(12px)',
+          willChange: 'transform'
         }}
         animate={{ rotate: 360, scale: [0.9, 1.1, 0.9] }}
         transition={{ duration: 12, repeat: Infinity, ease: 'linear' }}

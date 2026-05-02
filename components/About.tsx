@@ -109,7 +109,7 @@ export default function About() {
   return (
     <section id="about" className="py-28 bg-dark-2 relative overflow-hidden">
       <div className="absolute inset-0 dot-pattern opacity-30" />
-      <StarField count={90} />
+      <StarField count={35} />
       <ShootingStars />
 
       <motion.div animate={{ scale: [1, 1.2, 1], x: [0, 30, 0] }} transition={{ duration: 14, repeat: Infinity, ease: 'easeInOut' }}

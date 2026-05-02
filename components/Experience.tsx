@@ -2,7 +2,6 @@
 import { motion, useInView } from 'framer-motion'
 import { useRef, useMemo } from 'react'
 import StarField from './StarField'
-import BackgroundRockets from './Rocket'
 import { Briefcase, GraduationCap, MapPin, Calendar } from 'lucide-react'
 
 interface TimelineEntry {
@@ -149,8 +148,7 @@ export default function Experience() {
   return (
     <section id="experience" className="py-28 bg-dark relative overflow-hidden">
       <div className="absolute inset-0 space-dot-pattern opacity-50" />
-      <StarField count={40} />
-      <BackgroundRockets />
+      <StarField count={25} />
       <ShootingStars />
 
       <div className="blob-rose w-[450px] h-[450px] top-0 left-1/2 opacity-18" />

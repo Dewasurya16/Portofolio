@@ -1,6 +1,5 @@
 'use client'
 import { useState, useEffect } from 'react'
-import { motion } from 'framer-motion'
 
 interface Star {
   id: number
@@ -13,7 +12,7 @@ interface Star {
   opacity: number
 }
 
-export default function StarField({ count = 40 }: { count?: number }) {
+export default function StarField({ count = 30 }: { count?: number }) {
   const [stars, setStars] = useState<Star[]>([])
 
   useEffect(() => {
@@ -43,9 +42,9 @@ export default function StarField({ count = 40 }: { count?: number }) {
   return (
     <div className="absolute inset-0 overflow-hidden pointer-events-none">
       {stars.map((s) => (
-        <motion.div
+        <div
           key={s.id}
-          className="absolute rounded-full"
+          className="absolute rounded-full star-twinkle"
           style={{
             left: `${s.x}%`,
             top: `${s.y}%`,
@@ -53,16 +52,10 @@ export default function StarField({ count = 40 }: { count?: number }) {
             height: s.size,
             background: s.color,
             boxShadow: s.size > 1.5 ? `0 0 ${s.size * 3}px ${s.color}` : 'none',
-          }}
-          animate={{
-            opacity: [s.opacity * 0.3, s.opacity, s.opacity * 0.3],
-            scale: [0.7, 1.3, 0.7],
-          }}
-          transition={{
-            duration: s.duration,
-            delay: s.delay,
-            repeat: Infinity,
-            ease: 'easeInOut',
+            opacity: s.opacity,
+            animationDuration: `${s.duration}s`,
+            animationDelay: `${s.delay}s`,
+            willChange: 'opacity',
           }}
         />
       ))}

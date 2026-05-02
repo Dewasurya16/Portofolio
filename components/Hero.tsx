@@ -184,11 +184,11 @@ export default function Hero() {
 
       {/* Deep space background layers */}
       <div className="absolute inset-0 grid-pattern opacity-60" />
-      <StarField count={60} />
+      <StarField count={40} />
       <BackgroundRockets />
       <ShootingStars />
       <Constellation />
-      <Particles />
+      <Particles count={15} />
 
       {/* Nebula blobs */}
       <motion.div animate={{ scale: [1, 1.18, 1], x: [0, 35, 0] }} transition={{ duration: 12, repeat: Infinity, ease: 'easeInOut' }}
