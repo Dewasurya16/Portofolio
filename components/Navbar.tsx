@@ -38,7 +38,7 @@ export default function Navbar() {
       >
         <div className="max-w-7xl mx-auto px-6 lg:px-10 h-16 flex items-center justify-between">
           <motion.a href="#" whileHover={{ scale: 1.06 }} whileTap={{ scale: 0.97 }} className="font-display font-bold text-xl tracking-tight">
-            <span className="gradient-text">YN</span><span className="text-white/30">.</span>
+            <span className="gradient-text">Dewa Sinar Surya Porto</span><span className="text-white/30">.</span>
           </motion.a>
           <nav className="hidden md:flex items-center gap-1">
             {links.map((link, i) => (

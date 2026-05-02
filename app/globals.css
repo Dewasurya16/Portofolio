@@ -55,27 +55,68 @@ body {
   background-clip: text;
 }
 
-/* Glow blobs */
+/* ── SPACE THEME ── */
+
+/* Glow blobs — enhanced nebula-style */
 .blob-violet {
   position: absolute;
   border-radius: 50%;
-  background: radial-gradient(circle, rgba(139,92,246,0.18) 0%, transparent 70%);
+  background: radial-gradient(circle, rgba(109,40,217,0.22) 0%, rgba(139,92,246,0.1) 40%, transparent 70%);
   pointer-events: none;
-  filter: blur(1px);
+  filter: blur(2px);
 }
 .blob-cyan {
   position: absolute;
   border-radius: 50%;
-  background: radial-gradient(circle, rgba(34,211,238,0.14) 0%, transparent 70%);
+  background: radial-gradient(circle, rgba(6,182,212,0.18) 0%, rgba(34,211,238,0.08) 40%, transparent 70%);
   pointer-events: none;
-  filter: blur(1px);
+  filter: blur(2px);
 }
 .blob-rose {
   position: absolute;
   border-radius: 50%;
-  background: radial-gradient(circle, rgba(244,63,94,0.12) 0%, transparent 70%);
+  background: radial-gradient(circle, rgba(244,63,94,0.15) 0%, rgba(244,63,94,0.06) 40%, transparent 70%);
   pointer-events: none;
-  filter: blur(1px);
+  filter: blur(2px);
+}
+/* New: deep-space aurora blob */
+.blob-aurora {
+  position: absolute;
+  border-radius: 50%;
+  background: radial-gradient(ellipse, rgba(109,40,217,0.15) 0%, rgba(34,211,238,0.1) 35%, rgba(244,63,94,0.06) 65%, transparent 80%);
+  pointer-events: none;
+  filter: blur(3px);
+}
+
+/* Shooting star CSS */
+.shooting-star {
+  position: absolute;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+/* Cosmic orbit ring */
+.orbit-ring {
+  position: absolute;
+  border-radius: 50%;
+  border: 1px solid rgba(139,92,246,0.15);
+  pointer-events: none;
+}
+
+/* Nebula swirl */
+.nebula-swirl {
+  position: absolute;
+  border-radius: 50%;
+  background: conic-gradient(
+    from 0deg,
+    rgba(139,92,246,0.08) 0%,
+    rgba(34,211,238,0.06) 25%,
+    rgba(244,63,94,0.05) 50%,
+    rgba(167,139,250,0.08) 75%,
+    rgba(139,92,246,0.08) 100%
+  );
+  pointer-events: none;
+  filter: blur(30px);
 }
 
 /* Noise texture */
@@ -92,15 +133,24 @@ body {
 /* Grid pattern */
 .grid-pattern {
   background-image: 
-    linear-gradient(rgba(255,255,255,0.025) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(255,255,255,0.025) 1px, transparent 1px);
+    linear-gradient(rgba(255,255,255,0.02) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,0.02) 1px, transparent 1px);
   background-size: 60px 60px;
 }
 
 /* Dot pattern */
 .dot-pattern {
-  background-image: radial-gradient(circle, rgba(255,255,255,0.08) 1px, transparent 1px);
+  background-image: radial-gradient(circle, rgba(255,255,255,0.07) 1px, transparent 1px);
   background-size: 28px 28px;
+}
+
+/* Space dot pattern — denser, colored */
+.space-dot-pattern {
+  background-image:
+    radial-gradient(circle, rgba(139,92,246,0.12) 1px, transparent 1px),
+    radial-gradient(circle, rgba(34,211,238,0.08) 1px, transparent 1px);
+  background-size: 40px 40px, 67px 67px;
+  background-position: 0 0, 20px 20px;
 }
 
 /* Gradient border */
@@ -190,6 +240,7 @@ body {
   box-shadow: 0 0 0 3px rgba(139,92,246,0.1);
 }
 
+/* ── KEYFRAMES ── */
 @keyframes gradient {
   0%, 100% { background-position: 0% 50%; }
   50% { background-position: 100% 50%; }
@@ -202,7 +253,32 @@ body {
   0%, 100% { transform: translateY(0px); }
   50% { transform: translateY(-16px); }
 }
+@keyframes twinkle {
+  0%, 100% { opacity: 0.2; transform: scale(0.7); }
+  50% { opacity: 1; transform: scale(1.3); }
+}
+@keyframes shootingStar {
+  0%   { transform: translateX(0) translateY(0); opacity: 0; width: 0; }
+  5%   { opacity: 1; }
+  60%  { opacity: 0.8; }
+  100% { transform: translateX(400px) translateY(200px); opacity: 0; width: 120px; }
+}
+@keyframes orbitCW {
+  from { transform: rotate(0deg) translateX(var(--r, 120px)) rotate(0deg); }
+  to   { transform: rotate(360deg) translateX(var(--r, 120px)) rotate(-360deg); }
+}
+@keyframes orbitCCW {
+  from { transform: rotate(0deg) translateX(var(--r, 120px)) rotate(0deg); }
+  to   { transform: rotate(-360deg) translateX(var(--r, 120px)) rotate(360deg); }
+}
+@keyframes nebulaShift {
+  0%, 100% { transform: scale(1) rotate(0deg); opacity: 0.6; }
+  33% { transform: scale(1.08) rotate(120deg); opacity: 0.8; }
+  66% { transform: scale(0.95) rotate(240deg); opacity: 0.5; }
+}
 
 @layer utilities {
   .font-display { font-family: var(--font-display); }
+  .animate-twinkle { animation: twinkle var(--dur, 3s) ease-in-out infinite var(--del, 0s); }
+  .animate-nebula  { animation: nebulaShift 18s ease-in-out infinite; }
 }
