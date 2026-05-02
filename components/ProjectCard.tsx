@@ -22,7 +22,7 @@ function TiltCard({ children, accent }: { children: React.ReactNode; accent: str
   const resetTilt = () => { x.set(0); y.set(0) }
 
   return (
-    <motion.div ref={ref} onMouseMove={handleMouse} onMouseLeave={resetTilt}
+    <motion.div ref={ref} onMouseMove={handleMouse}
       style={{ rotateX, rotateY, transformStyle: 'preserve-3d', perspective: 1000 }}
       whileHover={{ scale: 1.03 }}
       transition={{ scale: { duration: 0.2 } }}
