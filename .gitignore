@@ -21,6 +21,8 @@
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+.chat-debug.*.log
+.verification-server.*.log
 
 # local env files
 .env*.local
