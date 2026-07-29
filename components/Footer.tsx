@@ -26,7 +26,7 @@ export default function Footer() {
           {/* Brand */}
           <div>
             <a href="#" className="font-display font-bold text-2xl">
-              <span className="gradient-text">YN</span>
+              <span className="gradient-text">Dewa Sinar Surya Porto</span>
               <span className="text-white/20">.</span>
             </a>
             <p className="text-text-faint text-sm mt-3 max-w-xs leading-relaxed">

@@ -27,7 +27,7 @@ const stats = [
   { icon: Calendar, label: 'Tahun Pengalaman', numValue: 3, suffix: '+', display: '3+', color: '#8B5CF6' },
   { icon: Code2, label: 'Proyek Selesai', numValue: 20, suffix: '+', display: '20+', color: '#22D3EE' },
   { icon: Coffee, label: 'Kopi per Hari', numValue: 0, suffix: '∞', display: '∞', color: '#F43F5E' },
-  { icon: MapPin, label: 'Kota', numValue: 0, suffix: 'Makassar', display: 'Makassar', color: '#A78BFA' },
+  { icon: MapPin, label: 'Kota', numValue: 0, suffix: 'Magelang', display: 'Magelang', color: '#A78BFA' },
 ]
 
 const traits = ['Problem Solver', 'Detail-Oriented', 'Creative Thinker', 'Team Player', 'Fast Learner']

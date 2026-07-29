@@ -8,7 +8,7 @@ const contactInfo = [
   ...(contactEmail
     ? [{ icon: Mail, label: 'Email', value: contactEmail, href: `mailto:${contactEmail}`, color: '#8B5CF6' }]
     : []),
-  { icon: MapPin, label: 'Lokasi', value: 'Makassar, Sulawesi Selatan', color: '#F43F5E' },
+  { icon: MapPin, label: 'Lokasi', value: 'Magelang, Jawa Tengah', color: '#F43F5E' },
 ]
 
 export default function Contact() {
