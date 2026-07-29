@@ -80,7 +80,7 @@ export default function Footer() {
 
         <div className="flex flex-col sm:flex-row items-center justify-between gap-3">
           <p className="text-xs text-text-faint">
-            © {new Date().getFullYear()} Nama Anda. Semua Hak Dilindungi.
+            © {new Date().getFullYear()} Dewa Sinar Surya,S.Kom. Semua Hak Dilindungi.
           </p>
           <p className="text-xs text-text-faint flex items-center gap-1.5">
             Dibangun dengan <Heart size={11} className="text-rose fill-rose" /> menggunakan Next.js · TypeScript · Framer Motion
