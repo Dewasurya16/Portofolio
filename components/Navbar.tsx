@@ -24,6 +24,22 @@ export default function Navbar() {
     return () => window.removeEventListener('scroll', onScroll)
   }, [])
 
+  useEffect(() => {
+    if (!open) return
+
+    const previousOverflow = document.body.style.overflow
+    const handleEscape = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') setOpen(false)
+    }
+    document.body.style.overflow = 'hidden'
+    window.addEventListener('keydown', handleEscape)
+
+    return () => {
+      document.body.style.overflow = previousOverflow
+      window.removeEventListener('keydown', handleEscape)
+    }
+  }, [open])
+
   return (
     <>
       <motion.div
@@ -67,6 +83,9 @@ export default function Navbar() {
           </div>
           <motion.button whileTap={{ scale: 0.9 }}
             className="md:hidden w-9 h-9 glass rounded-lg flex items-center justify-center text-text-muted"
+            aria-label={open ? 'Tutup menu navigasi' : 'Buka menu navigasi'}
+            aria-expanded={open}
+            aria-controls="mobile-navigation"
             onClick={() => setOpen(!open)}>
             <AnimatePresence mode="wait">
               {open
@@ -79,6 +98,7 @@ export default function Navbar() {
       <AnimatePresence>
         {open && (
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+            id="mobile-navigation"
             className="fixed inset-0 z-40 bg-dark/95 backdrop-blur-2xl flex flex-col items-center justify-center gap-6 md:hidden">
             {links.map((link, i) => (
               <motion.a key={link.href} href={link.href} onClick={() => { setActive(link.href); setOpen(false) }}

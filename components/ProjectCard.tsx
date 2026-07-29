@@ -36,33 +36,55 @@ function TiltCard({ children, accent }: { children: React.ReactNode; accent: str
 
 /* Space thumbnail for project card */
 export function SpaceThumbnail({ project }: { project: Project }) {
-  // Deterministic random so we don't get hydration mismatch (flicker)
-  const hashString = (str: string) => {
-    let hash = 0;
-    for (let i = 0; i < str.length; i++) hash = Math.imul(31, hash) + str.charCodeAt(i);
-    return hash;
-  };
-  const seed = hashString(project.title || "project");
-  const random = (i: number) => {
-    const x = Math.sin(seed + i) * 10000;
-    return x - Math.floor(x);
-  };
+  const hashString = (value: string): number => {
+    let hash = 0
+    for (let index = 0; index < value.length; index += 1) {
+      hash = Math.imul(31, hash) + value.charCodeAt(index)
+    }
+    return hash
+  }
+  const seed = hashString(project.title || 'project')
+  const random = (index: number): number => {
+    const value = Math.sin(seed + index) * 10_000
+    return value - Math.floor(value)
+  }
+  const stars = Array.from({ length: 12 }, (_, index) => {
+    const size = random(index + 30) > 0.7 ? 2 : 1
+
+    return {
+      id: index,
+      left: `${(random(index) * 100).toFixed(4)}%`,
+      top: `${(random(index + 15) * 100).toFixed(4)}%`,
+      size: `${size}px`,
+      opacity: Number((0.4 + random(index + 45) * 0.4).toFixed(6)),
+      duration: Number((2 + random(index + 60) * 2).toFixed(4)),
+      delay: Number((random(index + 75) * 3).toFixed(4)),
+    }
+  })
 
   return (
     <div className={`h-44 relative flex items-center justify-center overflow-hidden w-full`}
       style={{ background: `radial-gradient(ellipse at 30% 40%, ${project.nebula} 0%, rgba(5,5,10,0.95) 70%)` }}>
       {/* Star mini field in thumbnail */}
-      {Array.from({ length: 12 }, (_, i) => (
-        <motion.div key={i}
+      {stars.map((star) => (
+        <motion.div key={star.id}
           className="absolute rounded-full"
           style={{
-            left: `${random(i) * 100}%`, top: `${random(i + 15) * 100}%`,
-            width: random(i + 30) > 0.7 ? 2 : 1, height: random(i + 30) > 0.7 ? 2 : 1,
-            background: '#ffffff', opacity: 0.4 + random(i + 45) * 0.4,
-            willChange: 'opacity'
+            left: star.left,
+            top: star.top,
+            width: star.size,
+            height: star.size,
+            background: '#ffffff',
+            opacity: star.opacity,
+            willChange: 'opacity',
           }}
           animate={{ opacity: [0.2, 0.9, 0.2] }}
-          transition={{ duration: 2 + random(i + 60) * 2, delay: random(i + 75) * 3, repeat: Infinity }} />
+          transition={{
+            duration: star.duration,
+            delay: star.delay,
+            repeat: Infinity,
+          }}
+        />
       ))}
 
       {/* Nebula swirl */}
@@ -117,7 +139,19 @@ export function SpaceThumbnail({ project }: { project: Project }) {
 export default function ProjectCard({ project, priority = false }: { project: Project; priority?: boolean }) {
   const router = useRouter()
   return (
-    <div onClick={() => router.push(`/projects/${project.id}`)} className="block h-full">
+    <div
+      onClick={() => router.push(`/projects/${project.id}`)}
+      onKeyDown={(event) => {
+        if (event.key === 'Enter' || event.key === ' ') {
+          event.preventDefault()
+          router.push(`/projects/${project.id}`)
+        }
+      }}
+      role="link"
+      tabIndex={0}
+      aria-label={`Lihat detail proyek ${project.title}`}
+      className="block h-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet rounded-2xl"
+    >
       <TiltCard accent={project.accent}>
         <article className="glass rounded-2xl overflow-hidden border border-white/5 flex flex-col h-full transition-all duration-300 group">
           <SpaceThumbnail project={project} />
@@ -132,14 +166,20 @@ export default function ProjectCard({ project, priority = false }: { project: Pr
                 </span>
               ))}
             </div>
-            <div className="flex items-center gap-4 pt-4 border-t border-white/5" onClick={(e) => e.stopPropagation()}>
-              <motion.a href={project.link} target="_blank" rel="noopener noreferrer" whileHover={{ x: 3 }} className="flex items-center gap-1.5 text-sm text-text-muted hover:text-text-main transition-colors font-medium">
-                <ExternalLink size={13} /> Live Demo
-              </motion.a>
-              <motion.a href={project.github} target="_blank" rel="noopener noreferrer" whileHover={{ x: 3 }} className="flex items-center gap-1.5 text-sm text-text-muted hover:text-text-main transition-colors">
-                <Github size={13} /> Source
-              </motion.a>
-            </div>
+            {(project.link !== '#' || project.github !== '#') && (
+              <div className="flex items-center gap-4 pt-4 border-t border-white/5" onClick={(e) => e.stopPropagation()}>
+                {project.link !== '#' && (
+                  <motion.a href={project.link} target="_blank" rel="noopener noreferrer" whileHover={{ x: 3 }} className="flex items-center gap-1.5 text-sm text-text-muted hover:text-text-main transition-colors font-medium">
+                    <ExternalLink size={13} /> Live Demo
+                  </motion.a>
+                )}
+                {project.github !== '#' && (
+                  <motion.a href={project.github} target="_blank" rel="noopener noreferrer" whileHover={{ x: 3 }} className="flex items-center gap-1.5 text-sm text-text-muted hover:text-text-main transition-colors">
+                    <Github size={13} /> Source
+                  </motion.a>
+                )}
+              </div>
+            )}
           </div>
         </article>
       </TiltCard>

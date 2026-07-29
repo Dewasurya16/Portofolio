@@ -97,10 +97,10 @@ export default function Projects() {
         </motion.div>
 
         <motion.div initial={{ opacity: 0 }} animate={inView ? { opacity: 1 } : {}} transition={{ delay: 0.6 }} className="text-center mt-10">
-          <Link href="/projects" passHref legacyBehavior>
-            <motion.a whileHover={{ x: 6 }} className="inline-flex items-center gap-2 text-sm text-text-muted hover:text-violet-light transition-colors font-medium group cursor-pointer">
+          <Link href="/projects" className="inline-flex text-sm text-text-muted hover:text-violet-light transition-colors font-medium group">
+            <motion.span whileHover={{ x: 6 }} className="inline-flex items-center gap-2">
               Lihat Semua Proyek <ArrowRight size={15} className="group-hover:translate-x-1 transition-transform" />
-            </motion.a>
+            </motion.span>
           </Link>
         </motion.div>
       </div>

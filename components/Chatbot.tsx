@@ -2,18 +2,25 @@
 
 import { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Bot, X, Send, User, Loader2 } from 'lucide-react';
+import { Bot, X, Send } from 'lucide-react';
 
 interface Message {
   role: 'user' | 'assistant';
   content: string;
 }
 
+const INITIAL_MESSAGES: Message[] = [
+  {
+    role: 'assistant',
+    content:
+      'Halo! Saya asisten virtual Dewa. Ada yang bisa saya bantu tentang portofolio atau pengalaman Dewa?',
+  },
+]
+const CHAT_STORAGE_KEY = 'portfolio-chat-history'
+
 export default function Chatbot() {
   const [isOpen, setIsOpen] = useState(false);
-  const [messages, setMessages] = useState<Message[]>([
-    { role: 'assistant', content: 'Halo! Saya asisten virtual Dewa. Ada yang bisa saya bantu tentang portofolio atau pengalaman Dewa?' }
-  ]);
+  const [messages, setMessages] = useState<Message[]>(INITIAL_MESSAGES);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
@@ -25,6 +32,48 @@ export default function Chatbot() {
   useEffect(() => {
     scrollToBottom();
   }, [messages, isOpen]);
+
+  useEffect(() => {
+    try {
+      const stored = window.sessionStorage.getItem(CHAT_STORAGE_KEY)
+      if (!stored) return
+
+      const parsed = JSON.parse(stored) as unknown
+      if (
+        Array.isArray(parsed) &&
+        parsed.every(
+          (message) =>
+            typeof message === 'object' &&
+            message !== null &&
+            ('role' in message) &&
+            (message.role === 'user' || message.role === 'assistant') &&
+            ('content' in message) &&
+            typeof message.content === 'string',
+        )
+      ) {
+        setMessages(parsed.slice(-20) as Message[])
+      }
+    } catch {
+      window.sessionStorage.removeItem(CHAT_STORAGE_KEY)
+    }
+  }, [])
+
+  useEffect(() => {
+    window.sessionStorage.setItem(
+      CHAT_STORAGE_KEY,
+      JSON.stringify(messages.slice(-20)),
+    )
+  }, [messages])
+
+  useEffect(() => {
+    if (!isOpen) return
+
+    const handleEscape = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') setIsOpen(false)
+    }
+    window.addEventListener('keydown', handleEscape)
+    return () => window.removeEventListener('keydown', handleEscape)
+  }, [isOpen])
 
   const handleSend = async () => {
     if (!input.trim() || isLoading) return;
@@ -39,19 +88,25 @@ export default function Chatbot() {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          messages: [...messages, { role: 'user', content: userMessage }].map(m => ({
+          messages: [...messages, { role: 'user', content: userMessage }].slice(-20).map(m => ({
             role: m.role,
             content: m.content
           }))
         }),
       });
 
-      const data = await response.json();
+      const data = await response.json() as {
+        data?: { message?: string }
+        error?: { message?: string }
+      };
 
-      if (response.ok) {
-        setMessages(prev => [...prev, { role: 'assistant', content: data.message }]);
+      if (response.ok && data.data?.message) {
+        setMessages(prev => [...prev, { role: 'assistant', content: data.data!.message! }]);
       } else {
-        setMessages(prev => [...prev, { role: 'assistant', content: `Error: ${data.message || 'Terjadi kesalahan.'}` }]);
+        setMessages(prev => [...prev, {
+          role: 'assistant',
+          content: data.error?.message || 'Terjadi kesalahan.',
+        }]);
       }
     } catch (error) {
       setMessages(prev => [...prev, { role: 'assistant', content: 'Maaf, terjadi kesalahan pada jaringan.' }]);
@@ -75,8 +130,11 @@ export default function Chatbot() {
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 20, scale: 0.9 }}
             transition={{ type: 'spring', stiffness: 260, damping: 20 }}
-            className="mb-4 w-80 sm:w-96 rounded-2xl glass border border-white/10 shadow-2xl overflow-hidden flex flex-col"
+            className="mb-4 w-[calc(100vw-3rem)] sm:w-96 rounded-2xl glass border border-white/10 shadow-2xl overflow-hidden flex flex-col"
             style={{ height: '500px', maxHeight: '80vh' }}
+            role="dialog"
+            aria-modal="false"
+            aria-labelledby="chatbot-title"
           >
             {/* Header */}
             <div className="p-4 bg-violet/20 border-b border-white/10 flex items-center justify-between">
@@ -85,12 +143,13 @@ export default function Chatbot() {
                   <Bot size={18} className="text-violet-light" />
                 </div>
                 <div>
-                  <h3 className="font-display font-semibold text-text-main text-sm">Dewa's Assistant</h3>
+                  <h3 id="chatbot-title" className="font-display font-semibold text-text-main text-sm">Dewa&apos;s Assistant</h3>
                   <p className="text-xs text-text-muted">Online</p>
                 </div>
               </div>
               <button 
                 onClick={() => setIsOpen(false)}
+                aria-label="Tutup asisten virtual"
                 className="text-text-muted hover:text-white transition-colors p-1 rounded-md hover:bg-white/5"
               >
                 <X size={18} />
@@ -134,23 +193,34 @@ export default function Chatbot() {
 
             {/* Input Area */}
             <div className="p-3 border-t border-white/10 bg-dark/50">
-              <div className="relative flex items-center">
+              <form
+                className="relative flex items-center"
+                onSubmit={(event) => {
+                  event.preventDefault()
+                  void handleSend()
+                }}
+              >
+                <label htmlFor="chatbot-message" className="sr-only">Pesan untuk asisten virtual</label>
                 <input
+                  id="chatbot-message"
                   type="text"
                   value={input}
                   onChange={(e) => setInput(e.target.value)}
                   onKeyDown={handleKeyDown}
                   placeholder="Ketik pesan..."
+                  maxLength={2000}
+                  autoComplete="off"
                   className="w-full bg-white/5 border border-white/10 rounded-xl py-2.5 pl-4 pr-12 text-sm text-white placeholder-text-muted focus:outline-none focus:border-violet/50 focus:ring-1 focus:ring-violet/50 transition-all"
                 />
                 <button
-                  onClick={handleSend}
+                  type="submit"
                   disabled={!input.trim() || isLoading}
+                  aria-label="Kirim pesan"
                   className="absolute right-2 p-1.5 text-violet hover:text-violet-light disabled:text-text-muted disabled:opacity-50 transition-colors"
                 >
                   <Send size={18} />
                 </button>
-              </div>
+              </form>
             </div>
           </motion.div>
         )}
@@ -161,6 +231,8 @@ export default function Chatbot() {
         whileHover={{ scale: 1.05 }}
         whileTap={{ scale: 0.95 }}
         onClick={() => setIsOpen(!isOpen)}
+        aria-label={isOpen ? 'Tutup asisten virtual' : 'Buka asisten virtual'}
+        aria-expanded={isOpen}
         className="w-14 h-14 rounded-full bg-violet text-white shadow-[0_0_20px_rgba(139,92,246,0.4)] flex items-center justify-center hover:bg-violet-light transition-colors relative"
       >
         <AnimatePresence mode="wait">

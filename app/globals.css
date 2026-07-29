@@ -297,7 +297,10 @@ body {
 
 /* Reduce motion for users who prefer it + performance on lower-end devices */
 @media (prefers-reduced-motion: reduce) {
-  .star-twinkle, .particle-float, .animate-twinkle, .animate-nebula {
+  html {
+    scroll-behavior: auto;
+  }
+  .star-twinkle, .particle-float, .animate-twinkle, .animate-nebula, .shimmer, .gradient-text {
     animation: none;
   }
 }

@@ -1,0 +1,19 @@
+Chat provider request failed {
+  incidentId: '41561e37-f27f-41a8-a42b-b4f71ea41979',
+  error: Error: Connection error.
+      at async POST (app\api\chat\route.ts:90:28)
+    88 |     const apiMessages = [systemPrompt, ...payload.messages]
+    89 |
+  > 90 |     const chatCompletion = await groq.chat.completions.create({
+       |                            ^
+    91 |       messages: apiMessages,
+    92 |       model: 'llama-3.3-70b-versatile',
+    93 |       temperature: 0.7, {
+    status: undefined,
+    headers: undefined,
+    error: undefined,
+    [cause]: [TypeError: fetch failed] {
+      [cause]: [AggregateError: ] { code: 'EACCES' }
+    }
+  }
+}

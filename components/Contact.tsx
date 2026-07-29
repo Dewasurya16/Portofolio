@@ -1,25 +1,39 @@
 'use client'
 import { useState, useRef } from 'react'
 import { motion, useInView } from 'framer-motion'
-import { Mail, MapPin, Phone, Send, CheckCircle, Sparkles } from 'lucide-react'
+import { Mail, MapPin, Send, CheckCircle, Sparkles } from 'lucide-react'
 
+const contactEmail = process.env.NEXT_PUBLIC_CONTACT_EMAIL?.trim() || ''
 const contactInfo = [
-  { icon: Mail, label: 'Email', value: 'nama@email.com', href: 'mailto:nama@email.com', color: '#8B5CF6' },
-  { icon: Phone, label: 'WhatsApp', value: '+62 812-XXXX-XXXX', href: 'https://wa.me/62812XXXXXXXX', color: '#22D3EE' },
-  { icon: MapPin, label: 'Lokasi', value: 'Makassar, Sulawesi Selatan', href: '#', color: '#F43F5E' },
+  ...(contactEmail
+    ? [{ icon: Mail, label: 'Email', value: contactEmail, href: `mailto:${contactEmail}`, color: '#8B5CF6' }]
+    : []),
+  { icon: MapPin, label: 'Lokasi', value: 'Makassar, Sulawesi Selatan', color: '#F43F5E' },
 ]
 
 export default function Contact() {
   const ref = useRef(null)
   const inView = useInView(ref, { once: true, margin: '-80px' })
   const [sent, setSent] = useState(false)
+  const [formError, setFormError] = useState('')
   const [form, setForm] = useState({ name: '', email: '', subject: '', message: '' })
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
+    setFormError('')
+
+    if (!contactEmail) {
+      setFormError('Alamat email kontak belum dikonfigurasi oleh pemilik situs.')
+      return
+    }
+
+    const subject = encodeURIComponent(form.subject.trim() || `Pesan portofolio dari ${form.name.trim()}`)
+    const body = encodeURIComponent(
+      `Nama: ${form.name.trim()}\nEmail: ${form.email.trim()}\n\n${form.message.trim()}`,
+    )
+    window.location.assign(`mailto:${contactEmail}?subject=${subject}&body=${body}`)
     setSent(true)
     setTimeout(() => setSent(false), 4000)
-    setForm({ name: '', email: '', subject: '', message: '' })
   }
 
   return (
@@ -55,8 +69,22 @@ export default function Contact() {
             transition={{ delay: 0.2 }}
             className="lg:col-span-2 space-y-4"
           >
-            {contactInfo.map(({ icon: Icon, label, value, href, color }, i) => (
-              <motion.a
+            {contactInfo.map(({ icon: Icon, label, value, href, color }, i) => {
+              const content = (
+                <>
+                  <div className="w-11 h-11 rounded-xl flex items-center justify-center flex-shrink-0 transition-all"
+                    style={{ background: `${color}15`, border: `1px solid ${color}30` }}>
+                    <Icon size={18} style={{ color }} />
+                  </div>
+                  <div>
+                    <p className="text-xs text-text-faint mb-0.5 font-medium">{label}</p>
+                    <p className="text-sm font-semibold text-text-main">{value}</p>
+                  </div>
+                </>
+              )
+
+              return href ? (
+                <motion.a
                 key={label}
                 href={href}
                 initial={{ opacity: 0, y: 20 }}
@@ -66,17 +94,21 @@ export default function Contact() {
                 className="flex items-center gap-4 glass rounded-2xl p-5 border border-white/5 hover:border-white/10 transition-all group"
                 onMouseEnter={(e) => { e.currentTarget.style.boxShadow = `0 8px 32px ${color}18` }}
                 onMouseLeave={(e) => { e.currentTarget.style.boxShadow = 'none' }}
-              >
-                <div className="w-11 h-11 rounded-xl flex items-center justify-center flex-shrink-0 transition-all"
-                  style={{ background: `${color}15`, border: `1px solid ${color}30` }}>
-                  <Icon size={18} style={{ color }} />
-                </div>
-                <div>
-                  <p className="text-xs text-text-faint mb-0.5 font-medium">{label}</p>
-                  <p className="text-sm font-semibold text-text-main">{value}</p>
-                </div>
-              </motion.a>
-            ))}
+                >
+                  {content}
+                </motion.a>
+              ) : (
+                <motion.div
+                  key={label}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={inView ? { opacity: 1, y: 0 } : {}}
+                  transition={{ delay: 0.3 + i * 0.1 }}
+                  className="flex items-center gap-4 glass rounded-2xl p-5 border border-white/5"
+                >
+                  {content}
+                </motion.div>
+              )
+            })}
 
             {/* Availability */}
             <motion.div
@@ -114,37 +146,40 @@ export default function Contact() {
                 <div className="w-16 h-16 rounded-2xl flex items-center justify-center mb-5" style={{ background: 'rgba(34,197,94,0.15)', border: '1px solid rgba(34,197,94,0.3)' }}>
                   <CheckCircle size={32} className="text-emerald-400" />
                 </div>
-                <h3 className="font-display font-bold text-2xl text-text-main mb-2">Pesan Terkirim!</h3>
-                <p className="text-text-muted">Terima kasih, saya akan segera menghubungi Anda.</p>
+                <h3 className="font-display font-bold text-2xl text-text-main mb-2">Aplikasi Email Dibuka</h3>
+                <p className="text-text-muted">Periksa dan kirim pesan melalui aplikasi email Anda.</p>
               </motion.div>
             ) : (
               <form onSubmit={handleSubmit} className="space-y-5">
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
                   <div>
-                    <label className="block text-xs font-semibold text-text-faint mb-2 uppercase tracking-wider">Nama</label>
-                    <input type="text" required value={form.name}
+                    <label htmlFor="contact-name" className="block text-xs font-semibold text-text-faint mb-2 uppercase tracking-wider">Nama</label>
+                    <input id="contact-name" name="name" type="text" required value={form.name}
                       onChange={(e) => setForm({ ...form, name: e.target.value })}
-                      className="input-dark" placeholder="Nama lengkap" />
+                      maxLength={100} autoComplete="name" className="input-dark" placeholder="Nama lengkap" />
                   </div>
                   <div>
-                    <label className="block text-xs font-semibold text-text-faint mb-2 uppercase tracking-wider">Email</label>
-                    <input type="email" required value={form.email}
+                    <label htmlFor="contact-email" className="block text-xs font-semibold text-text-faint mb-2 uppercase tracking-wider">Email</label>
+                    <input id="contact-email" name="email" type="email" required value={form.email}
                       onChange={(e) => setForm({ ...form, email: e.target.value })}
-                      className="input-dark" placeholder="email@contoh.com" />
+                      maxLength={254} autoComplete="email" className="input-dark" placeholder="email@contoh.com" />
                   </div>
                 </div>
                 <div>
-                  <label className="block text-xs font-semibold text-text-faint mb-2 uppercase tracking-wider">Subjek</label>
-                  <input type="text" value={form.subject}
+                  <label htmlFor="contact-subject" className="block text-xs font-semibold text-text-faint mb-2 uppercase tracking-wider">Subjek</label>
+                  <input id="contact-subject" name="subject" type="text" value={form.subject}
                     onChange={(e) => setForm({ ...form, subject: e.target.value })}
-                    className="input-dark" placeholder="Topik diskusi" />
+                    maxLength={150} className="input-dark" placeholder="Topik diskusi" />
                 </div>
                 <div>
-                  <label className="block text-xs font-semibold text-text-faint mb-2 uppercase tracking-wider">Pesan</label>
-                  <textarea required rows={5} value={form.message}
+                  <label htmlFor="contact-message" className="block text-xs font-semibold text-text-faint mb-2 uppercase tracking-wider">Pesan</label>
+                  <textarea id="contact-message" name="message" required rows={5} value={form.message}
                     onChange={(e) => setForm({ ...form, message: e.target.value })}
-                    className="input-dark resize-none" placeholder="Ceritakan proyek atau ide Anda..." />
+                    maxLength={3000} className="input-dark resize-none" placeholder="Ceritakan proyek atau ide Anda..." />
                 </div>
+                {formError && (
+                  <p role="alert" className="text-sm text-rose-300">{formError}</p>
+                )}
                 <motion.button
                   type="submit"
                   whileHover={{ scale: 1.02 }}

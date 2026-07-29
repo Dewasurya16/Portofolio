@@ -2,6 +2,7 @@
 import { useState, useEffect, useRef, useMemo } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { ArrowDown, Github, Linkedin, Mail, Sparkles, Loader2 } from 'lucide-react'
+import Image from 'next/image'
 import StarField from './StarField'
 import Particles from './Particles'
 import BackgroundRockets from './Rocket'
@@ -108,18 +109,25 @@ function Constellation() {
 function CursorGlow() {
   const ref = useRef<HTMLDivElement>(null)
   useEffect(() => {
+    if (window.matchMedia('(pointer: coarse)').matches) return
+
+    let frameId = 0
     const move = (e: MouseEvent) => {
-      if (ref.current) {
-        ref.current.style.left = `${e.clientX}px`
-        ref.current.style.top = `${e.clientY}px`
-      }
+      window.cancelAnimationFrame(frameId)
+      frameId = window.requestAnimationFrame(() => {
+        if (!ref.current) return
+        ref.current.style.transform = `translate3d(${e.clientX - 250}px, ${e.clientY - 250}px, 0)`
+      })
     }
     window.addEventListener('mousemove', move)
-    return () => window.removeEventListener('mousemove', move)
+    return () => {
+      window.cancelAnimationFrame(frameId)
+      window.removeEventListener('mousemove', move)
+    }
   }, [])
   return (
-    <div ref={ref} className="pointer-events-none fixed z-0 -translate-x-1/2 -translate-y-1/2"
-      style={{ width: 500, height: 500, background: 'radial-gradient(circle, rgba(139,92,246,0.06) 0%, transparent 65%)', borderRadius: '50%', transition: 'left 0.12s ease, top 0.12s ease' }} />
+    <div ref={ref} className="pointer-events-none fixed z-0 hidden md:block"
+      style={{ width: 500, height: 500, background: 'radial-gradient(circle, rgba(139,92,246,0.06) 0%, transparent 65%)', borderRadius: '50%', willChange: 'transform' }} />
   )
 }
 
@@ -162,12 +170,14 @@ export default function Hero() {
           messages: [{ role: 'user', content: 'Berikan satu kalimat sapaan kreatif, keren, dan singkat (maksimal 15 kata) untuk menyambut pengunjung ke portofolio saya (Dewa Sinar Surya). Jangan gunakan tanda kutip.' }]
         })
       });
-      const data = await response.json();
-      if (response.ok) {
-        setAiGreeting(data.message.replace(/"/g, ''));
+      const data = await response.json() as {
+        data?: { message?: string }
+      };
+      if (response.ok && data.data?.message) {
+        setAiGreeting(data.data.message.replace(/"/g, ''));
       }
-    } catch (e) {
-      console.error(e);
+    } catch {
+      setAiGreeting(null)
     } finally {
       setIsGeneratingGreeting(false);
     }
@@ -260,7 +270,7 @@ export default function Hero() {
             </AnimatePresence>
             
             {!aiGreeting && (
-              <button onClick={generateGreeting} disabled={isGeneratingGreeting} className="absolute -bottom-7 left-0 text-xs text-violet hover:text-violet-light flex items-center gap-1.5 transition-colors disabled:opacity-50">
+              <button onClick={generateGreeting} disabled={isGeneratingGreeting} aria-label="Buat sapaan menggunakan AI" className="absolute -bottom-7 left-0 text-xs text-violet hover:text-violet-light flex items-center gap-1.5 transition-colors disabled:opacity-50">
                 {isGeneratingGreeting ? <Loader2 size={13} className="animate-spin" /> : <Sparkles size={13} />}
                 {isGeneratingGreeting ? 'Menghasilkan sapaan AI...' : 'Sapaan AI Magic'}
               </button>
@@ -325,7 +335,13 @@ export default function Hero() {
                     transition={{ duration: 3.5, repeat: Infinity, ease: 'linear' }}
                     style={{ background: 'conic-gradient(from 0deg, #8B5CF6 0%, #22D3EE 28%, transparent 46%, transparent 56%, #F43F5E 74%, #A78BFA 88%, #8B5CF6 100%)' }} />
                   <div className="absolute overflow-hidden" style={{ inset: '2px', borderRadius: '14px', background: '#07070E' }}>
-                    <img src="/3.png" alt="Dewa Sinar Surya" className="w-full h-full object-cover object-top" />
+                    <Image
+                      src="/portrait-hero.avif"
+                      alt="Dewa Sinar Surya"
+                      fill
+                      sizes="96px"
+                      className="w-full h-full object-cover object-top"
+                    />
                   </div>
                 </div>
                 {ORBIT_DOTS.map((d, i) => (

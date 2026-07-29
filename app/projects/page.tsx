@@ -15,7 +15,7 @@ export default function ProjectsPage() {
   return (
     <main className="min-h-screen bg-dark noise py-24 relative overflow-hidden">
       <div className="absolute inset-0 dot-pattern opacity-25" />
-      <StarField count={150} />
+      <StarField count={60} />
       <Particles count={25} />
       
       {/* Glow blobs */}
@@ -28,10 +28,10 @@ export default function ProjectsPage() {
         
         {/* Navigation */}
         <div className="mb-12">
-          <Link href="/#projects" passHref legacyBehavior>
-            <motion.a whileHover={{ x: -4 }} className="inline-flex items-center gap-2 text-sm text-text-muted hover:text-violet-light transition-colors font-medium cursor-pointer">
+          <Link href="/#projects" className="inline-flex text-sm text-text-muted hover:text-violet-light transition-colors font-medium">
+            <motion.span whileHover={{ x: -4 }} className="inline-flex items-center gap-2">
               <ArrowLeft size={16} /> Kembali ke Beranda
-            </motion.a>
+            </motion.span>
           </Link>
         </div>
 

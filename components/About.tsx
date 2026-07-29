@@ -1,8 +1,11 @@
 'use client'
 import { motion, useInView } from 'framer-motion'
 import { useRef, useEffect, useState, useMemo } from 'react'
+import Image from 'next/image'
 import StarField from './StarField'
 import { MapPin, Calendar, Coffee, Code2, Download, ArrowRight } from 'lucide-react'
+
+const cvUrl = process.env.NEXT_PUBLIC_CV_URL?.trim()
 
 function AnimatedNumber({ target, suffix = '', inView }: { target: number | string; suffix?: string; inView: boolean }) {
   const [display, setDisplay] = useState('0')
@@ -192,9 +195,11 @@ export default function About() {
                     className="absolute overflow-hidden"
                     style={{ inset: '3px', borderRadius: '21px', background: '#07070E' }}
                   >
-                    <img
-                      src="/2.png"
+                    <Image
+                      src="/portrait-about.avif"
                       alt="Dewa Sinar Surya"
+                      fill
+                      sizes="(max-width: 768px) 240px, 320px"
                       className="w-full h-full object-cover object-top"
                     />
                     {/* Bottom name overlay */}
@@ -295,16 +300,18 @@ export default function About() {
               ))}
             </div>
 
-            <motion.a href="/cv.pdf"
+            {cvUrl && <motion.a href={cvUrl}
               initial={{ opacity: 0 }} animate={inView ? { opacity: 1 } : {}} transition={{ delay: 1.1 }}
               whileHover={{ scale: 1.05, boxShadow: '0 0 30px rgba(139,92,246,0.3)' }} whileTap={{ scale: 0.97 }}
+              target="_blank"
+              rel="noopener noreferrer"
               className="mt-8 inline-flex items-center gap-2 px-6 py-3 rounded-xl glass border border-white/10 text-text-main text-sm font-semibold hover:border-violet/40 transition-all duration-300 group">
               <Download size={15} className="text-violet" />
               Download CV
               <motion.span animate={{ x: [0, 4, 0] }} transition={{ duration: 1.5, repeat: Infinity }} className="ml-1">
                 <ArrowRight size={13} className="text-violet" />
               </motion.span>
-            </motion.a>
+            </motion.a>}
           </motion.div>
         </div>
       </div>
